@@ -1,7 +1,8 @@
+/* eslint-disable id-length */
 import Dthree from 'd3';
 import React from 'react';
 
-export default class SilverSeriesBars extends React.Component {
+export default class SilverSeriesBar extends React.Component {
 
   // PROP TYPES
   static get propTypes() {
