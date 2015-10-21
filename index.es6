@@ -1,4 +1,3 @@
-/* eslint-disable id-length */
 import Dthree from 'd3';
 import React from 'react';
 
@@ -46,6 +45,8 @@ export default class SilverSeriesBar extends React.Component {
   }
 
   // ======= Dthree stuff =======
+  // Note that I'm using 'ddd' and 'iii' to get round
+  // eslint id-length issue
 
   // UPDATE BARS
   updateBars() {
@@ -73,18 +74,18 @@ export default class SilverSeriesBar extends React.Component {
       .enter().append('rect')
       // .transition().duration(duration)
         .attr('class', 'd3-bar-rect')
-        .attr('y', (d) => yScale(d.category))
+        .attr('y', (ddd) => yScale(ddd.category))
         .attr('x', 0)
         .attr('height', yScale.rangeBand())
         .attr('width', 0)
-        .on('click', (d, i) => this.barClick(d, i))
+        .on('click', (ddd, iii) => this.barClick(ddd, iii))
         ;
 
     barBinding
       .transition().duration(duration)
-        .attr('width', (d) => xScale(d.value))
+        .attr('width', (ddd) => xScale(ddd.value))
         .attr('x', 0)
-        .attr('y', (d) => yScale(d.category))
+        .attr('y', (ddd) => yScale(ddd.category))
         .attr('height', yScale.rangeBand())
         ;
 
