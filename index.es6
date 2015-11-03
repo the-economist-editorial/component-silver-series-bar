@@ -13,17 +13,6 @@ export default class SilverSeriesBar extends React.Component {
     };
   }
 
-  // DEFAULT PROPS
-  static get defaultProps() {
-    return {};
-  }
-
-  // CONSTRUCTOR
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   // COMPONENT DID MOUNT
   componentDidMount() {
     this.updateBars();
@@ -44,7 +33,7 @@ export default class SilverSeriesBar extends React.Component {
     this.props.passBarClick(clickObj);
   }
 
-  // ======= Dthree stuff =======
+  // ======= D3 stuff =======
   // Note that I'm using 'ddd' and 'iii' to get round
   // eslint id-length issue
 
@@ -96,7 +85,7 @@ export default class SilverSeriesBar extends React.Component {
   }
   // UPDATE BARS ends
 
-  // ===== Dthree stuff ends =====
+  // ===== D3 stuff ends =====
 
   // RENDER
   render() {
