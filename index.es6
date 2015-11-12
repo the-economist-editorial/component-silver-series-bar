@@ -9,7 +9,7 @@ export default class SilverSeriesBar extends React.Component {
       test: React.PropTypes.string,
       config: React.PropTypes.object,
       passBarClick: React.PropTypes.func,
-
+      colours: React.PropTypes.array,
     };
   }
 
@@ -33,6 +33,17 @@ export default class SilverSeriesBar extends React.Component {
     this.props.passBarClick(clickObj);
   }
 
+  getColours(headers) {
+    // Lose first element (col 1 header)
+    headers.shift();
+    // Colours: hard-coded for now but need to move into some sort of lookup
+    const coloursArray = [ '#004D64', '#6995A8', '#009FD8', '#ACADB0' ];
+    const colourScale = Dthree.scale.ordinal()
+      .domain(headers)
+      .range(coloursArray);
+    return colourScale;
+  }
+
   // ======= D3 stuff =======
   // Note that I'm using 'ddd' and 'iii' to get round
   // eslint id-length issue
@@ -51,9 +62,27 @@ export default class SilverSeriesBar extends React.Component {
 
     // Data
     const data = config.data;
+    const headers = Object.keys(data[0]);
+    const colours = this.getColours(headers);
+
+    // Map data:
+    const mappedData = colours.domain().map(
+      (name) => {
+        return {
+          name,
+          series: data.map(
+            (ddd) => {
+              return { category: ddd.category, value: Number(ddd[name]), header: name };
+            }),
+        };
+      });
+
     // Bind data
     const barBinding = barGroup.selectAll('rect')
-      .data(data);
+      // .data(data);
+      // ***    STILL THINGS TO DO HERE WITH MULTIPLE SERIES...    ***
+      // *** Currently using first series only, no matter how many ***
+      .data(mappedData[0].series);
     // Not used:
     // const height = config.bounds.height;
     // ENTER
@@ -67,6 +96,7 @@ export default class SilverSeriesBar extends React.Component {
         .attr('x', 0)
         .attr('height', yScale.rangeBand())
         .attr('width', 0)
+        .style('fill', (ddd) => colours(ddd.header))
         .on('click', (ddd, iii) => this.barClick(ddd, iii))
         ;
 

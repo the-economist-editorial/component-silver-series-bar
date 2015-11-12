@@ -1,4 +1,5 @@
 .d3-bar-rect {
-  fill: #998888;
   cursor: pointer;
+  stroke-width: 0;
+  shape-rendering: crispEdges;
 }
