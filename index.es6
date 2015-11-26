@@ -35,11 +35,13 @@ export default class SilverSeriesBar extends React.Component {
 
   getColours(headers) {
     // Lose first element (col 1 header)
-    headers.shift();
+    // (Ouch! I originally did headers.shift(), which messes headers array
+    // up, back up the chain...)
+    const gcHeaders = headers.slice(1);
     // Colours: hard-coded for now but need to move into some sort of lookup
     const coloursArray = [ '#004D64', '#6995A8', '#009FD8', '#ACADB0' ];
     const colourScale = Dthree.scale.ordinal()
-      .domain(headers)
+      .domain(gcHeaders)
       .range(coloursArray);
     return colourScale;
   }
@@ -62,9 +64,10 @@ export default class SilverSeriesBar extends React.Component {
 
     // Data
     const data = config.data;
-    const headers = Object.keys(data[0]);
+    // const headers = Object.keys(data[0]);
+    const headers = config.headers;
+    const catHead = headers[0];
     const colours = this.getColours(headers);
-
     // Map data:
     const mappedData = colours.domain().map(
       (name) => {
@@ -72,7 +75,7 @@ export default class SilverSeriesBar extends React.Component {
           name,
           series: data.map(
             (ddd) => {
-              return { category: ddd.category, value: Number(ddd[name]), header: name };
+              return { category: ddd[catHead], value: Number(ddd[name]), header: name };
             }),
         };
       });
