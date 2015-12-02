@@ -3,3 +3,13 @@
   stroke-width: 0;
   shape-rendering: crispEdges;
 }
+
+.d3-bar-zero-black{
+  stroke-width: 0.3;
+  stroke: #000000;
+}
+
+.d3-bar-zero-red{
+  stroke-width: 0.5;
+  stroke: #FF0000;
+}

@@ -16,11 +16,13 @@ export default class SilverSeriesBar extends React.Component {
   // COMPONENT DID MOUNT
   componentDidMount() {
     this.updateBars();
+    this.updateZeroLine();
   }
 
   // COMPONENT DID UPDATE
   componentDidUpdate() {
     this.updateBars();
+    this.updateZeroLine();
   }
 
   // ======= Event handler ======
@@ -94,22 +96,27 @@ export default class SilverSeriesBar extends React.Component {
     barBinding
       .enter().append('rect')
       // .transition().duration(duration)
-        .attr('class', 'd3-bar-rect')
-        .attr('y', (ddd) => yScale(ddd.category))
-        .attr('x', 0)
-        .attr('height', yScale.rangeBand())
-        .attr('width', 0)
+        .attr({
+          'class': 'd3-bar-rect',
+          'y': (ddd) => yScale(ddd.category),
+          'height': yScale.rangeBand(),
+          'x': 0,
+          'width': 0,
+        })
         .style('fill', (ddd) => colours(ddd.header))
         .on('click', (ddd, iii) => this.barClick(ddd, iii))
         ;
 
+    // Update. This can handle +/– values, but insists upon a 'default'
+    // anchorage to zero (ie, it can't handle broken scales...)
     barBinding
       .transition().duration(duration)
-        .attr('width', (ddd) => xScale(ddd.value))
-        .attr('x', 0)
-        .attr('y', (ddd) => yScale(ddd.category))
-        .attr('height', yScale.rangeBand())
-        ;
+        .attr({
+          'x': (ddd) => xScale(Math.min(0, ddd.value)),
+          'width': (ddd) => Math.abs(xScale(ddd.value) - xScale(0)),
+          'y': (ddd) => yScale(ddd.category),
+          'height': yScale.rangeBand(),
+        });
 
     barBinding.exit()
       .transition().duration(duration)
@@ -117,6 +124,50 @@ export default class SilverSeriesBar extends React.Component {
         .remove();
   }
   // UPDATE BARS ends
+
+
+  // UPDATE ZERO LINE
+  // Handles any zero line
+  updateZeroLine() {
+    const config = this.props.config;
+    // Context and duration
+    // (In the long term, we'd need more than one group...)
+    const barGroup = Dthree.select('.d3-bar-series-group');
+    const duration = config.duration;
+    // Passed scale:
+    const xScale = config.xScale;
+    // How will the zero line appear?
+    // I don't think we need to check max. If min<0, red zero line...
+    let zeroClass = 'd3-bar-zero-black';
+    if (xScale.domain()[0] < 0) {
+      zeroClass = 'd3-bar-zero-red';
+    }
+    // Bind data
+    const zeroBinding = barGroup.selectAll('line')
+      .data([]);
+    const height = config.bounds.height;
+    //
+    // ENTER
+    zeroBinding
+      .enter().append('line');
+
+    // UPDATE. This can handle +/– values, but insists upon a 'default'
+    // anchorage to zero (ie, it can't handle broken scales...)
+    zeroBinding
+      .transition().duration(duration)
+      .attr({
+        'class': zeroClass,
+        'x1': xScale(0),
+        'y1': 0,
+        'x2': xScale(0),
+        'y2': height,
+      })
+      ;
+
+    zeroBinding.exit()
+        .remove();
+  }
+  // UPDATE ZERO LINE ends
 
   // ===== D3 stuff ends =====
 
