@@ -142,14 +142,14 @@ export default class SilverSeriesBar extends React.Component {
     if (xScale.domain()[0] < 0) {
       zeroClass = 'd3-bar-zero-red';
     }
-    // Bind data
+    // Bind data (needs *some* value)
     const zeroBinding = barGroup.selectAll('line')
-      .data([]);
+      .data([ 0 ]);
     const height = config.bounds.height;
     //
     // ENTER
-    zeroBinding
-      .enter().append('line');
+    zeroBinding.enter()
+      .append('line');
 
     // UPDATE. This can handle +/– values, but insists upon a 'default'
     // anchorage to zero (ie, it can't handle broken scales...)
@@ -159,10 +159,9 @@ export default class SilverSeriesBar extends React.Component {
         'class': zeroClass,
         'x1': xScale(0),
         'y1': 0,
-        'x2': xScale(0),
+        'x2': xScale(),
         'y2': height,
-      })
-      ;
+      });
 
     zeroBinding.exit()
         .remove();
