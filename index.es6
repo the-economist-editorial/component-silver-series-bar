@@ -9,7 +9,6 @@ export default class SilverSeriesBar extends React.Component {
       test: React.PropTypes.string,
       config: React.PropTypes.object,
       passBarClick: React.PropTypes.func,
-      colours: React.PropTypes.array,
     };
   }
 
@@ -35,20 +34,20 @@ export default class SilverSeriesBar extends React.Component {
     this.props.passBarClick(clickObj);
   }
 
-  getColours(headers) {
+  // GET COLOURS
+  // Called from updateBars to map colours by series
+  getColours(headers, colourSet) {
     // Lose first element (col 1 header)
-    // (Ouch! I originally did headers.shift(), which messes headers array
-    // up, back up the chain...)
     const gcHeaders = headers.slice(1);
-    // Colours: hard-coded for now but need to move into some sort of lookup
-    const coloursArray = [ '#004D64', '#6995A8', '#009FD8', '#ACADB0' ];
+    // Colours from config file
+    // const colourSet = [ '#004D64', '#6995A8', '#009FD8', '#ACADB0' ];
     const colourScale = Dthree.scale.ordinal()
       .domain(gcHeaders)
-      .range(coloursArray);
+      .range(colourSet);
     return colourScale;
   }
+  // GET COLOURS ends
 
-  // ======= D3 stuff =======
   // Note that I'm using 'ddd' and 'iii' to get round
   // eslint id-length issue
 
@@ -59,17 +58,15 @@ export default class SilverSeriesBar extends React.Component {
     // (In the long term, we'd need more than one group...)
     const barGroup = Dthree.select('.d3-bar-series-group');
     const duration = config.duration;
-
     // Passed scales:
     const xScale = config.xScale;
     const yScale = config.yScale;
-
     // Data
     const data = config.data;
-    // const headers = Object.keys(data[0]);
     const headers = config.headers;
     const catHead = headers[0];
-    const colours = this.getColours(headers);
+    const colourSet = config.colourSet;
+    const colours = this.getColours(headers, colourSet);
     // Map data:
     const mappedData = colours.domain().map(
       (name) => {
@@ -95,7 +92,6 @@ export default class SilverSeriesBar extends React.Component {
     // Width is zero by default when new rects are created
     barBinding
       .enter().append('rect')
-      // .transition().duration(duration)
         .attr({
           'class': 'd3-bar-rect',
           'y': (ddd) => yScale(ddd.category),
@@ -107,7 +103,8 @@ export default class SilverSeriesBar extends React.Component {
         .on('click', (ddd, iii) => this.barClick(ddd, iii))
         ;
 
-    // Update. This can handle +/– values, but insists upon a 'default'
+    // Update.
+    // NOTE: this can handle +/– values, but (for now) insists upon a 'default'
     // anchorage to zero (ie, it can't handle broken scales...)
     barBinding
       .transition().duration(duration)
@@ -131,7 +128,7 @@ export default class SilverSeriesBar extends React.Component {
   updateZeroLine() {
     const config = this.props.config;
     // Context and duration
-    // (In the long term, we'd need more than one group...)
+    // (NOTE: In the long term, we'd need more than one group...)
     const barGroup = Dthree.select('.d3-bar-series-group');
     const duration = config.duration;
     // Passed scale:
@@ -150,16 +147,16 @@ export default class SilverSeriesBar extends React.Component {
     // ENTER
     zeroBinding.enter()
       .append('line');
-
-    // UPDATE. This can handle +/– values, but insists upon a 'default'
-    // anchorage to zero (ie, it can't handle broken scales...)
+    // NOTE. This can handle +/– values, but insists upon a 'default'
+    // anchorage to zero (ie, it can't handle broken scales... yet)
+    // (Although if scale breaks, the zero line will vanish somewhere off-chart...)
     zeroBinding
       .transition().duration(duration)
       .attr({
         'class': zeroClass,
         'x1': xScale(0),
         'y1': 0,
-        'x2': xScale(),
+        'x2': xScale(0),
         'y2': height,
       });
 
@@ -167,8 +164,6 @@ export default class SilverSeriesBar extends React.Component {
         .remove();
   }
   // UPDATE ZERO LINE ends
-
-  // ===== D3 stuff ends =====
 
   // RENDER
   render() {
