@@ -101,7 +101,15 @@ export default class SilverSeriesBar extends React.Component {
         })
         .style('fill', (ddd) => colours(ddd.header))
         .on('click', (ddd, iii) => this.barClick(ddd, iii))
-        ;
+        // NOTE: can't use '=>' because D3 needs to select 'this'
+        /* eslint-disable func-names, no-invalid-this */
+        .each(function () {
+          Dthree.select(this).append('svg:title');
+        })
+      ;
+
+    // Append SVG 'title' with category and value for tooltip
+    // const svgTitle = barBinding.enter().append('svg:title').text('OK');
 
     // Update.
     // NOTE: this can handle +/– values, but (for now) insists upon a 'default'
@@ -113,7 +121,20 @@ export default class SilverSeriesBar extends React.Component {
           'width': (ddd) => Math.abs(xScale(ddd.value) - xScale(0)),
           'y': (ddd) => yScale(ddd.category),
           'height': yScale.rangeBand(),
-        });
+        })
+        // See 'enter', above
+        .each(function (ddd) {
+          const myBar = Dthree.select(this);
+          myBar.select('title').text(`${ddd.category}: ${ddd.value}`);
+        })
+    ;
+
+    // svgTitle.text((ddd) => {
+    //   console.log(`${ddd}: 15.42`);
+    //   return `${ddd.category}: ${ddd.value}`;
+    // });
+
+    // svgTitle.text((ddd) => `${ddd.category}: ${ddd.value}`);
 
     barBinding.exit()
       .transition().duration(duration)
@@ -121,7 +142,6 @@ export default class SilverSeriesBar extends React.Component {
         .remove();
   }
   // UPDATE BARS ends
-
 
   // UPDATE ZERO LINE
   // Handles any zero line
