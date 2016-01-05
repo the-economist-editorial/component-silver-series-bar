@@ -1,15 +1,20 @@
+/* Bars */
 .d3-bar-rect {
   cursor: pointer;
   stroke-width: 0;
   shape-rendering: crispEdges;
 }
+/* Hover fill is !important to override d3-set style */
+.d3-bar-rect:hover {
+  fill: red !important;
+}
 
-.d3-bar-zero-black{
+/* Zero line */
+.d3-bar-zero-black {
   stroke-width: 0.3;
   stroke: #000000;
 }
-
-.d3-bar-zero-red{
+.d3-bar-zero-red {
   stroke-width: 0.5;
   stroke: #FF0000;
 }
