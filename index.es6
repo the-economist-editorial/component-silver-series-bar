@@ -91,7 +91,8 @@ export default class SilverSeriesBar extends React.Component {
     //    y0: the cumulative baseline value (0 for 1st)
     //    y: the 'internal' value of THIS point
     // At this point, these are actual unscaled vals
-
+    // console.log('Stacked bars mappedData');
+    // console.log(mappedData);
     // Bind outer (series) data
     const groupBinding = barGroup.selectAll('.series-group')
       .data(mappedData);
@@ -113,10 +114,16 @@ export default class SilverSeriesBar extends React.Component {
       .remove()
       ;
 
+    // console.log("groupBinding: ")
+    // console.log(groupBinding);
+
     // Bind inner (points) data
     const rectBinding = groupBinding.selectAll('.d3-bar-rect')
-      .data((ddd) => ddd);
-    // Enter appands rect on zero, at zero width
+      .data((ddd) => {
+        // console.log(ddd);
+        return ddd;
+      });
+    // Enter appends rect on zero, at zero width
     rectBinding.enter()
       .append('rect')
         .attr({
